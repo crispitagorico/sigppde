@@ -1,9 +1,6 @@
 import numpy as np
-import torch
 from scipy.stats import norm, pearsonr
 from scipy.optimize import brentq
-import sigkernel
-import matplotlib.pyplot as plt
 
 def r2(x, y):
     return pearsonr(x,y)[0]**2
@@ -107,22 +104,6 @@ def psi_matrix(t_grid, s_samples, t_samples, X_samples, a, xi, eta):
         x = X_samples[i,ind_s,1]
         M[i,:] = psi(s, x, a, xi, eta)
     return M
-
-def sig_kernel_matrices(X_samples, Y_samples, Z_samples, sig_kernel, max_batch, device):
-    X_samples = torch.tensor(X_samples, dtype=torch.float64, device=device)
-    Y_samples = torch.tensor(Y_samples, dtype=torch.float64, device=device)
-    Z_samples = torch.tensor(Z_samples, dtype=torch.float64, device=device)
-
-    # eps_diff = 1e-4
-    # M = sig_kernel.compute_Gram(X_samples, Y_samples, max_batch=max_batch)    
-    # M_eps  = sig_kernel.compute_Gram(X_samples + eps_diff*Z_samples, Y_samples, max_batch=max_batch)
-    # M_2eps = sig_kernel.compute_Gram(X_samples + 2.*eps_diff*Z_samples, Y_samples, max_batch=max_batch)
-    # M_diff      = (1./eps_diff)*(M_eps - M)
-    # M_diff_diff = (1./eps_diff)*((1./eps_diff)*(M_2eps - M_eps)-M_diff)
-    
-    M, M_diff, M_diff_diff = sig_kernel.compute_kernel_and_derivatives_Gram(X_samples, Y_samples, Z_samples, max_batch=max_batch)
-    
-    return M.cpu().numpy(), M_diff.cpu().numpy(), M_diff_diff.cpu().numpy()
 
 # From https://github.com/ryanmccrickerd/rough_bergomi.
 def generate_dW1(a, n_increments, n_samples):
